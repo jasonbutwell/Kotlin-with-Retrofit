@@ -4,10 +4,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
+import android.widget.Toast
 import com.smartherd.globofly.R
 import com.smartherd.globofly.helpers.SampleData
 import com.smartherd.globofly.models.Destination
+import com.smartherd.globofly.services.DestinationService
+import com.smartherd.globofly.services.ServiceBuilder
 import kotlinx.android.synthetic.main.activity_destiny_detail.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 
 class DestinationDetailActivity : AppCompatActivity() {
@@ -37,15 +43,41 @@ class DestinationDetailActivity : AppCompatActivity() {
 	private fun loadDetails(id: Int) {
 
 		// To be replaced by retrofit code
-		val destination = SampleData.getDestinationById(id)
+//		val destination = SampleData.getDestinationById(id)
+//
+//		destination?.let {
+//			et_city.setText(destination.city)
+//			et_description.setText(destination.description)
+//			et_country.setText(destination.country)
+//
+//			collapsing_toolbar.title = destination.city
+//		}
 
-		destination?.let {
-			et_city.setText(destination.city)
-			et_description.setText(destination.description)
-			et_country.setText(destination.country)
+		val destinationService = ServiceBuilder.buildService(DestinationService::class.java)
+		val requestCall = destinationService.getDestinationById(id)
 
-			collapsing_toolbar.title = destination.city
-		}
+		requestCall.enqueue(object: Callback<Destination>{
+			override fun onFailure(call: Call<Destination>, t: Throwable) {
+				Toast.makeText(this@DestinationDetailActivity, "Failed to retrieve details", Toast.LENGTH_LONG).show()
+			}
+
+			override fun onResponse(call: Call<Destination>, response: Response<Destination>) {
+				if (response.isSuccessful) {
+					val destination = response.body()
+
+					destination?.let {
+						et_city.setText(destination.city)
+						et_description.setText(destination.description)
+						et_country.setText(destination.country)
+
+						collapsing_toolbar.title = destination.city
+					}
+				}
+				else
+					Toast.makeText(this@DestinationDetailActivity, "Failed to retrieve details", Toast.LENGTH_LONG).show()
+			}
+		})
+
 	}
 
 	private fun initUpdateButton(id: Int) {
