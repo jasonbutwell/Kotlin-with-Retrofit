@@ -42,7 +42,12 @@ class DestinationListActivity : AppCompatActivity() {
 //		destiny_recycler_view.adapter = DestinationAdapter(SampleData.DESTINATIONS)
 
 		val destinationService : DestinationService = ServiceBuilder.buildService(DestinationService::class.java)
-		val requestCall = destinationService.getDestinationList()
+
+		val filter = HashMap<String,String>()
+		//filter.put("country","India")
+		//filter.put("count","1")
+
+		val requestCall = destinationService.getDestinationList(filter)
 
 		requestCall.enqueue(object: Callback<List<Destination>> {
 			override fun onFailure(call: Call<List<Destination>>, t: Throwable) {
