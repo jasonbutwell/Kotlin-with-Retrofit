@@ -51,7 +51,7 @@ class DestinationListActivity : AppCompatActivity() {
 
 		requestCall.enqueue(object: Callback<List<Destination>> {
 			override fun onFailure(call: Call<List<Destination>>, t: Throwable) {
-				Toast.makeText(this@DestinationListActivity, "Error Occurred: " + t.toString(), Toast.LENGTH_LONG).show()
+				Toast.makeText(this@DestinationListActivity, "Error Occurred: $t", Toast.LENGTH_LONG).show()
 			}
 
 			override fun onResponse(call: Call<List<Destination>>, response: Response<List<Destination>>) {
