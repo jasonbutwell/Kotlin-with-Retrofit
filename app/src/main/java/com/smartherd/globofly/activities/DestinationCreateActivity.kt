@@ -2,10 +2,16 @@ package com.smartherd.globofly.activities
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import com.smartherd.globofly.R
 import com.smartherd.globofly.helpers.SampleData
 import com.smartherd.globofly.models.Destination
+import com.smartherd.globofly.services.DestinationService
+import com.smartherd.globofly.services.ServiceBuilder
 import kotlinx.android.synthetic.main.activity_destiny_create.*
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class DestinationCreateActivity : AppCompatActivity() {
 
@@ -27,8 +33,29 @@ class DestinationCreateActivity : AppCompatActivity() {
 			newDestination.country = et_country.text.toString()
 
 			// To be replaced by retrofit code
-			SampleData.addDestination(newDestination)
-            finish() // Move back to DestinationListActivity
+//			SampleData.addDestination(newDestination)
+//            finish() // Move back to DestinationListActivity
+
+            val destinationService = ServiceBuilder.buildService(DestinationService::class.java)
+            val requestCall = destinationService.addDestination(newDestination)
+
+            requestCall.enqueue(object:Callback<Destination>{
+                override fun onFailure(call: Call<Destination>, t: Throwable) {
+                    Toast.makeText(this@DestinationCreateActivity, "Failed to add item", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onResponse(call: Call<Destination>, response: Response<Destination>) {
+                    if (response.isSuccessful) {
+                        finish()
+                        var newlyCreatedDestination = response.body() // use or ignore
+                        Toast.makeText(this@DestinationCreateActivity, "Successfully Added.", Toast.LENGTH_SHORT).show()
+
+                    } else
+                        Toast.makeText(this@DestinationCreateActivity, "Failed to add item", Toast.LENGTH_SHORT).show()
+                }
+
+            })
+
 		}
 	}
 }
