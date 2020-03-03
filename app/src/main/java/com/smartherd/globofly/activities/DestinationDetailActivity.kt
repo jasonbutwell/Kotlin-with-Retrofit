@@ -1,5 +1,6 @@
 package com.smartherd.globofly.activities
 
+import android.app.Service
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
@@ -88,15 +89,34 @@ class DestinationDetailActivity : AppCompatActivity() {
 			val description = et_description.text.toString()
 			val country = et_country.text.toString()
 
-            // To be replaced by retrofit code
-            val destination = Destination()
-            destination.id = id
-            destination.city = city
-            destination.description = description
-            destination.country = country
+			val destinationService = ServiceBuilder.buildService(DestinationService::class.java)
+			val requestCall = destinationService.updateDestination(id,city,description,country)
 
-            SampleData.updateDestination(destination);
-            finish() // Move back to DestinationListActivity
+			requestCall.enqueue(object: Callback<Destination>{
+				override fun onFailure(call: Call<Destination>, t: Throwable) {
+					Toast.makeText(this@DestinationDetailActivity, "Failed to update item",Toast.LENGTH_SHORT).show()
+				}
+
+				override fun onResponse(call: Call<Destination>, response: Response<Destination>) {
+					if ( response.isSuccessful) {
+						finish()
+						var updatedDestination = response.body() // Use or ignore
+						Toast.makeText(this@DestinationDetailActivity, "Item Updated Successfully",Toast.LENGTH_SHORT).show()
+					} else
+						Toast.makeText(this@DestinationDetailActivity, "Failed to update item",Toast.LENGTH_SHORT).show()
+				}
+
+			})
+
+            // To be replaced by retrofit code
+//            val destination = Destination()
+//            destination.id = id
+//            destination.city = city
+//            destination.description = description
+//            destination.country = country
+//
+//            SampleData.updateDestination(destination);
+//            finish() // Move back to DestinationListActivity
 		}
 	}
 
