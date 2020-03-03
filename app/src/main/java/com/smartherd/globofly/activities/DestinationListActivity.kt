@@ -47,7 +47,7 @@ class DestinationListActivity : AppCompatActivity() {
 		//filter.put("country","India")
 		//filter.put("count","1")
 
-		val requestCall = destinationService.getDestinationList(filter)
+		val requestCall = destinationService.getDestinationList(filter, "EN")
 
 		requestCall.enqueue(object: Callback<List<Destination>> {
 			override fun onFailure(call: Call<List<Destination>>, t: Throwable) {
