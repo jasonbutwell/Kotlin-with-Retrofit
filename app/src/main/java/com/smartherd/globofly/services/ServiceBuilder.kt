@@ -1,9 +1,13 @@
 package com.smartherd.globofly.services
 
+import android.os.Build
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
+import okhttp3.Response
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import java.util.*
 
 object ServiceBuilder {
 
@@ -15,9 +19,28 @@ object ServiceBuilder {
 
     private val logger = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
 
+    // Create a custom interceptor to apply headers application wide
+
+    val headerInterceptor = object: Interceptor {
+        override fun intercept(chain: Interceptor.Chain): Response {
+
+            val request = chain.request()
+
+            request.newBuilder()
+                .addHeader("x-device-type", Build.DEVICE)
+                .addHeader("Accept-Language", Locale.getDefault().language)
+                .build()
+
+            val response = chain.proceed(request)
+            return response
+        }
+    }
+
     // OkHttp client
 
-    private val okHttp : OkHttpClient.Builder = OkHttpClient.Builder().addInterceptor(logger)
+    private val okHttp : OkHttpClient.Builder = OkHttpClient.Builder()
+        .addInterceptor(headerInterceptor)
+        .addInterceptor(logger)
 
     // Retrofit Builder
 
